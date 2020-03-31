@@ -1,0 +1,101 @@
+{
+  "version":"1.0",
+  "venue":"fxtrades",
+  "messageStart":{"type":"BYTE", "length":"1", "value":"01"},
+  "messageEnd":{"type":"BYTE", "length":"1", "value":"03"},
+  "fieldPadding":{"type":"BYTE", "length":"1", "value":"02"},
+  "messageIdentifierField":"MESSAGE_TYPE",
+  "messageHeader": {"fields":[
+      {"name":"SEQUENCE_NUMBER", "type":"INTEGER", "length":4},
+      {"name":"TIMESTAMP", "type":"INTEGER", "length":4},
+      {"name":"MESSAGE_TYPE", "type":"ALPHA", "length":1}
+  ]},
+
+  "messages":
+      [
+      {"messageType":"LOGON", "messageIdentifierValue":"A", "flowDirection":"OUT", "fields":[
+          {"name":"USER_ID","type":"ALPHA", "length":20},
+          {"name":"PASSWORD","type":"ALPHA", "length":20},
+          {"name":"SESSION_ID","type":"INTEGER", "length":4}]},
+
+      {"messageType":"LOGOUT", "messageIdentifierValue":"B", "flowDirection":"BOTH", "fields":[
+          {"name":"USER_ID","type":"ALPHA", "length":20},
+          {"name":"SESSION_ID","type":"INTEGER", "length":4},
+          {"name":"LOGOUT_REASON","type":"ALPHA", "length":3}]},
+
+      {"messageType":"HEART_BEAT", "messageIdentifierValue":"C", "flowDirection":"BOTH", "fields":[
+          {"name":"SESSION_ID","type":"INTEGER", "length":4}]},
+
+      {"messageType":"INSTRUMENT_INFO_REQUEST", "messageIdentifierValue":"D", "flowDirection":"OUT", "fields":[
+          {"name":"SESSION_ID","type":"INTEGER", "length":4}]},
+
+      {"messageType":"INSTRUMENT_INFO", "messageIdentifierValue":"E", "flowDirection":"IN", "fields":[
+          {"name":"SESSION_ID","type":"INTEGER", "length":4},
+          {"name":"INSTRUMENT_INDEX","type":"SHORT", "length":2},
+          {"name":"INSTRUMENT_TYPE","type":"ALPHA", "length":1},
+          {"name":"INSTRUMENT_ID","type":"ALPHA", "length":20},
+          {"name":"SETTLEMENT_DATE","type":"LONG", "length":8}]},
+
+      {"messageType":"NEW_ORDER_REQUEST", "messageIdentifierValue":"F", "flowDirection":"OUT", "fields":[
+          {"name":"CL_ORDER_ID","type":"INTEGER", "length":4},
+          {"name":"ORDER_TYPE","type":"ALPHA", "length":2, "values":{"F":"LIMIT_ORDER", "Z":"ICEBERG"}},
+          {"name":"INSTRUMENT_INDEX","type":"SHORT", "length":2},
+          {"name":"SIDE","type":"ALPHA", "length":1},
+          {"name":"ORDER_AMOUNT","type":"LONG", "transform":"AMOUNT", "length":8},
+          {"name":"MIN_AMOUNT","type":"LONG", "transform":"AMOUNT", "length":8},
+          {"name":"PRICE","type":"INTEGER", "transform":"RATE", "length":4},
+          {"name":"SHOW_AMOUNT","type":"LONG", "transform":"AMOUNT", "length":8},
+          {"name":"EXPIRE_TYPE","type":"ALPHA", "length":1}]},
+
+      {"messageType":"NEW_ORDER_ACK", "messageIdentifierValue":"G", "flowDirection":"IN", "fields":[
+          {"name":"CL_ORDER_ID","type":"INTEGER", "length":4},
+          {"name":"ORDER_ID","type":"LONG", "length":8},
+          {"name":"STATUS","type":"ALPHA", "length":1, "values":{"R":"REJECTED", "C":"CONFIRMED"}},
+          {"name":"ERROR_CODE","type":"SHORT", "length":2}]},
+
+      {"messageType":"CANCEL_ORDER", "messageIdentifierValue":"H", "flowDirection":"OUT", "fields":[
+          {"name":"NEW_CL_ORDER_ID","type":"INTEGER", "length":4},
+          {"name":"PREV_CL_ORDER_ID","type":"INTEGER", "length":4},
+          {"name":"INSTRUMENT_INDEX","type":"SHORT", "length":2}]},
+
+      {"messageType":"CANCEL_ORDER_REJECT", "messageIdentifierValue":"I", "flowDirection":"IN", "fields":[
+          {"name":"NEW_CL_ORDER_ID","type":"INTEGER", "length":4},
+          {"name":"PREV_CL_ORDER_ID","type":"INTEGER", "length":4},
+          {"name":"ERROR_CODE","type":"SHORT", "length":2}]},
+
+      {"messageType":"ORDER_REPLACE_CANCEL", "messageIdentifierValue":"J", "flowDirection":"OUT", "fields":[
+          {"name":"NEW_CL_ORDER_ID","type":"INTEGER", "length":4},
+          {"name":"PREV_CL_ORDER_ID","type":"INTEGER", "length":4},
+          {"name":"ORDER_AMOUNT","type":"LONG", "transform":"AMOUNT", "length":8},
+          {"name":"PRICE","type":"INTEGER", "transform":"RATE", "length":4},
+          {"name":"INSTRUMENT_INDEX","type":"SHORT", "length":2}]},
+
+          {"messageType":"ORDER_REPLACE_ACK", "messageIdentifierValue":"K", "flowDirection":"IN", "fields":[
+          {"name":"NEW_CL_ORDER_ID","type":"INTEGER", "length":4},
+          {"name":"PREV_CL_ORDER_ID","type":"INTEGER", "length":4},
+          {"name":"STATUS","type":"ALPHA", "length":1, "values":{"C":"CANCELLED", "R":"REJECTED", "P":"REPLACED"}},
+          {"name":"ERROR_CODE","type":"SHORT", "length":2}]},
+
+      {"messageType":"ORDER_CANCELED_EXPIRED", "messageIdentifierValue":"L", "flowDirection":"IN", "fields":[
+          {"name":"CL_ORDER_ID","type":"INTEGER", "length":4},
+          {"name":"ORDER_ID","type":"LONG", "length":8},
+          {"name":"STATUS","type":"ALPHA", "length":1, "values":{"E":"EXPIRED", "C":"CANCELED"}},
+          {"name":"TYPE","type":"SHORT", "length":2, "values":{"0":"User Cancel", "1":"System Cancel", "2":"Below Minimum Cancel"}}]},
+
+      {"messageType":"TRADE", "messageIdentifierValue":"M", "flowDirection":"IN", "fields":[
+          {"name":"CL_ORDER_ID","type":"INTEGER", "length":4},
+          {"name":"ORDER_ID","type":"LONG", "length":8},
+          {"name":"INSTRUMENT_INDEX","type":"SHORT", "length":2},
+          {"name":"SIDE","type":"ALPHA", "length":1},
+          {"name":"FILL_AMOUNT","type":"LONG","transform":"AMOUNT", "length":8},
+          {"name":"FILL_RATE","type":"INTEGER","transform":"RATE", "length":4},
+          {"name":"EXEC_BROKER","type":"ALPHA", "length":4},
+          {"name":"EXECUTION_ID","type":"ALPHA", "length":20},
+          {"name":"EXEC_TYPE","type":"ALPHA", "length":1, "values":{"1":"New Trade", "2":"Suspended Trade", "3":"Trade Promote", "4":"Trade Demote"}},
+          {"name":"SETTLEMENT_DATE","type":"LONG", "length":8},
+          {"name":"TRADE_DATE","type":"LONG", "length":8},
+          {"name":"TRANSACT_TIME","type":"LONG", "length":8},
+          {"name":"LEAVES_AMOUNT","type":"LONG", "transform":"AMOUNT", "length":8},
+          {"name":"AGGRESSOR_FLAG","type":"ALPHA", "length":1}]}
+      ]
+}		
